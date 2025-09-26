@@ -5,7 +5,8 @@ export function qs(selector, parent = document) {
 
 // Retrieve data from localStorage
 export function getLocalStorage(key) {
-  return JSON.parse(localStorage.getItem(key));
+  const data = localStorage.getItem(key);
+  return data ? JSON.parse(data) : null;
 }
 
 // Save data to localStorage
@@ -34,27 +35,39 @@ export function renderWithTemplate(template, parentElement, data, callback) {
 
 // Load an HTML template from a path asynchronously
 export async function loadTemplate(path) {
-  const res = await fetch(path);
-  if (!res.ok) {
-    console.error(`Failed to load template: ${path}`, res.status);
+  try {
+    const res = await fetch(path);
+    if (!res.ok) {
+      console.error(`Failed to load template: ${path}`, res.status);
+      return "";
+    }
+    return await res.text();
+  } catch (err) {
+    console.error(`Error fetching template: ${path}`, err);
     return "";
   }
-  return await res.text();
 }
 
 // Load header and footer partials into #main-header and #main-footer
+// Also updates cart count automatically
 export async function loadHeaderFooter() {
   const header = document.getElementById("main-header");
   const footer = document.getElementById("main-footer");
 
+  // Load header
   if (header) {
-    // adjust relative path if needed
+    // Adjust relative path based on current page location
     const headerTemplate = await loadTemplate("../partials/header.html");
     renderWithTemplate(headerTemplate, header);
+
+    // Update cart count
+    const cartCountSpan = header.querySelector("#cart-count");
+    const cartItems = getLocalStorage("so-cart") || [];
+    if (cartCountSpan) cartCountSpan.textContent = cartItems.length;
   }
 
+  // Load footer
   if (footer) {
-    // adjust relative path if needed
     const footerTemplate = await loadTemplate("../partials/footer.html");
     renderWithTemplate(footerTemplate, footer);
   }
