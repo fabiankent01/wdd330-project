@@ -4,9 +4,9 @@ function productCardTemplate(product) {
   return `
     <li class="product-card">
       <a href="/product_pages/?product=${product.Id}">
-        <img src="${product.Images.PrimaryMedium}" alt="${product.Name}">
-        <h3>${product.Brand.Name}</h3>
-        <p>${product.NameWithoutBrand}</p>
+        <img src="${product.Images?.PrimaryMedium || ""}" alt="${product.Name}">
+        <h3>${product.Brand?.Name || ""}</h3>
+        <p>${product.NameWithoutBrand || product.Name}</p>
         <p class="product-card__price">$${product.FinalPrice}</p>
       </a>
     </li>
@@ -14,25 +14,33 @@ function productCardTemplate(product) {
 }
 
 export default class ProductList {
-  constructor(category, dataSource, listElement) {
-    this.category = category;
+  constructor(queryOrCategory, dataSource, listElement, isSearch = false) {
+    this.queryOrCategory = queryOrCategory;
     this.dataSource = dataSource;
     this.listElement = listElement;
+    this.isSearch = isSearch;
   }
 
   async init() {
-    const list = await this.dataSource.getData(this.category);
+    let list = [];
+    if (this.isSearch) {
+      // run search query
+      list = await this.dataSource.searchProducts(this.queryOrCategory);
+      document.querySelector(".title").textContent = `Results for "${this.queryOrCategory}"`;
+    } else {
+      // run category query
+      list = await this.dataSource.getData(this.queryOrCategory);
+      document.querySelector(".title").textContent = this.queryOrCategory;
+    }
+
     this.renderList(list);
-    document.querySelector(".title").textContent = this.category;
   }
 
   renderList(list) {
-    // const htmlStrings = list.map(productCardTemplate);
-    // this.listElement.insertAdjacentHTML("afterbegin", htmlStrings.join(""));
-
-    // apply use new utility function instead of the commented code above
+    if (!list || list.length === 0) {
+      this.listElement.innerHTML = "<p>No products found.</p>";
+      return;
+    }
     renderListWithTemplate(productCardTemplate, this.listElement, list);
-
   }
-
 }

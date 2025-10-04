@@ -1,5 +1,6 @@
 import ProductData from "./ProductData.mjs";
 
+// Utility functions
 function getQueryParam(param) {
   const params = new URLSearchParams(window.location.search);
   return params.get(param);
@@ -9,38 +10,32 @@ function formatPrice(price) {
   return `$${price.toFixed(2)}`;
 }
 
-function createDiscountBadge(percent) {
-  const badge = document.createElement("span");
-  badge.className = "discount-indicator";
-  badge.textContent = `-${percent}% OFF`;
-  return badge;
-}
-
 function getImage(product) {
-  if (product.Images && product.Images.PrimaryLarge)
-    return product.Images.PrimaryLarge;
+  if (product.Images && product.Images.PrimaryLarge) return product.Images.PrimaryLarge;
+  if (product.Images && product.Images.PrimaryMedium) return product.Images.PrimaryMedium;
   if (product.Image) return product.Image;
   return "";
 }
 
+// Render product detail
 function renderProductDetail(product) {
   const main = document.querySelector("main.divider");
   if (!main) return;
+
   main.innerHTML = "";
+
   if (!product) {
-    main.innerHTML =
-      '<section class="product-detail"><h2>Product not found</h2></section>';
+    main.innerHTML = '<section class="product-detail"><h2>Product not found</h2></section>';
     return;
   }
+
   const image = getImage(product);
   const brand = (product.Brand && product.Brand.Name) || product.Brand || "";
   const name = product.NameWithoutBrand || product.Name || "";
-  const price =
-    product.FinalPrice ||
-    product.ListPrice ||
-    product.SuggestedRetailPrice ||
-    0;
+  const price = product.FinalPrice || product.ListPrice || product.SuggestedRetailPrice || 0;
   const oldPrice = product.SuggestedRetailPrice || product.ListPrice || 0;
+  const color = (product.Colors && product.Colors[0] && product.Colors[0].ColorName) || "";
+
   let discountHTML = "";
   let priceHTML = `<span class='new-price'>${formatPrice(price)}</span>`;
   if (oldPrice > price) {
@@ -48,8 +43,7 @@ function renderProductDetail(product) {
     discountHTML = `<span class='discount-indicator'>-${percent}% OFF</span>`;
     priceHTML = `<span class='old-price'>${formatPrice(oldPrice)}</span> <span class='new-price'>${formatPrice(price)}</span>`;
   }
-  const color =
-    product.Colors && product.Colors[0] ? product.Colors[0].ColorName : "";
+
   main.innerHTML = `
     <section class="product-detail">
       <h3>${brand}</h3>
@@ -59,44 +53,52 @@ function renderProductDetail(product) {
       <p class="product__color">${color}</p>
       <p class="product__description">${product.DescriptionHtmlSimple || ""}</p>
       <div class="product-detail__add">
-        <button id="addToCart" data-id="${product.Id}" data-category="${getQueryParam("category")}">Add to Cart</button>
+        <button id="addToCart" data-id="${product.Id}">Add to Cart</button>
       </div>
     </section>
   `;
-  // Add to cart event
-  document.getElementById("addToCart").addEventListener("click", async (e) => {
-    let cart = JSON.parse(localStorage.getItem("so-cart")) || [];
+
+  // Add to cart functionality
+  document.getElementById("addToCart").addEventListener("click", (e) => {
+    const cart = JSON.parse(localStorage.getItem("so-cart")) || [];
     cart.push(product);
     localStorage.setItem("so-cart", JSON.stringify(cart));
+
     const messageDiv = document.createElement("div");
     messageDiv.textContent = "Successfully added to cart!";
     messageDiv.style.color = "green";
     messageDiv.style.marginTop = "10px";
     e.target.parentElement.appendChild(messageDiv);
+
     setTimeout(() => {
       messageDiv.remove();
     }, 3000);
 
     const sup = document.getElementById("cart-count");
-    sup.innerHTML = cart.length;
+    if (sup) sup.textContent = cart.length;
 
-    document.querySelector(".cart-link").classList.toggle("saved");
+    const cartLink = document.querySelector(".cart-link");
+    if (cartLink) cartLink.classList.toggle("saved");
   });
 }
 
+// Load product detail from API
 async function loadProductDetail() {
   const id = getQueryParam("id");
-  const category = getQueryParam("category") || "tents";
   if (!id) return;
-  const dataSource = new ProductData(category);
-  let products = await dataSource.getData();
-  if (products.Result) products = products.Result;
-  const product = products.find(
-    (item) => String(item.Id).toLowerCase() === String(id).toLowerCase(),
-  );
-  renderProductDetail(product);
+
+  const dataSource = new ProductData();
+  try {
+    const product = await dataSource.findProductById(id);
+    renderProductDetail(product);
+  } catch (err) {
+    console.error("Error loading product:", err);
+    const main = document.querySelector("main.divider");
+    if (main) main.innerHTML = '<p>There was an error loading the product.</p>';
+  }
 }
 
+// Initialize when DOM is ready
 if (document.querySelector("main.divider")) {
   loadProductDetail();
 }

@@ -36,6 +36,44 @@ header {
   padding: 0.5rem;
 }
 
+/* Search form styles */
+.search-form {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.search-form input[type="text"] {
+  padding: 0.4em 0.6em;
+  border: 1px solid var(--light-grey);
+  border-radius: 4px 0 0 4px;
+  font-size: var(--small-font);
+  outline: none;
+  width: 160px;
+  transition: width 0.3s ease-in-out;
+}
+
+.search-form input[type="text"]:focus {
+  width: 220px;
+  /* expand on focus */
+  border-color: var(--primary-color);
+}
+
+.search-form button {
+  padding: 0.45em 0.8em;
+  border: none;
+  background-color: var(--secondary-color);
+  color: white;
+  font-size: var(--small-font);
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.search-form button:hover {
+  background-color: var(--primary-color);
+}
+
 p {
   padding: 0.75rem;
 }
@@ -90,7 +128,7 @@ p {
   margin-top: -1.3em;
 }
 
-.logo--square > div {
+.logo--square>div {
   margin-top: -1.7em;
 }
 
@@ -154,16 +192,20 @@ button {
 .cart-link.saved .bag {
   animation: pop 0.5s linear forwards;
 }
+
 @keyframes pop {
   0% {
     transform: scale(1) rotate(0deg);
   }
+
   40% {
     transform: scale(1.2) rotate(-10deg);
   }
+
   75% {
     transform: scale(1.5) rotate(0deg);
   }
+
   100% {
     transform: scale(1) rotate(0deg);
   }
@@ -283,6 +325,7 @@ button {
   display: flex;
   flex-direction: column;
 }
+
 .remove-from-cart {
   color: #c00;
   font-size: 1.5em;
@@ -294,10 +337,12 @@ button {
   margin-bottom: 0.5em;
   transition: color 0.2s;
 }
+
 .remove-from-cart:hover {
   color: rgb(0, 172, 20);
   text-shadow: 0 0 2px #252525;
 }
+
 .discount {
   position: absolute;
   background: #ff0000;
@@ -329,6 +374,7 @@ button {
   border-top: 2px solid var(--primary-color);
   background: #fffbe7;
 }
+
 .cart-total {
   font-size: 1.2em;
   font-weight: bold;
@@ -365,11 +411,13 @@ button {
   margin-bottom: 0.5em;
   padding: 20px;
 }
+
 .category-link img:hover {
   transform: scale(1.1);
   border: solid 1px var(--primary-color);
   border-radius: 50%;
 }
+
 .category-link:hover {
   color: var(--primary-color);
   font-weight: bold;
@@ -396,6 +444,7 @@ footer {
   flex-direction: column;
   gap: 0.5rem;
 }
+
 .alert-list p {
   margin: 0;
   padding: 0.75rem 1.25rem;
@@ -414,6 +463,7 @@ footer {
   100% {
     transform: translateX(-100%);
   }
+
   0% {
     transform: translateX(100vw);
   }
