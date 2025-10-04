@@ -275,3 +275,59 @@ footer {
   font-size: var(--small-font);
   padding: 1em;
 }
+
+/* Alert message styles */
+.alert {
+  background-color: #fee;
+  border: 1px solid #c00;
+  border-radius: 4px;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: slideIn 0.3s ease-out;
+}
+
+.alert p {
+  margin: 0;
+  padding: 0;
+  color: #c00;
+  font-weight: 600;
+  flex: 1;
+}
+
+.alert-close {
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #c00;
+  font-weight: bold;
+  padding: 0 0.5rem;
+  transition: color 0.2s;
+}
+
+.alert-close:hover {
+  color: #900;
+}
+
+.alert.success {
+  background-color: #efe;
+  border-color: #0a0;
+}
+
+.alert.success p,
+.alert.success .alert-close {
+  color: #0a0;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

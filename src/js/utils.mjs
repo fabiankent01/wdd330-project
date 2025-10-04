@@ -81,3 +81,39 @@ export function renderListWithTemplate(
   const htmlStrings = list.map(templateFn);
   parentElement.insertAdjacentHTML(position, htmlStrings.join(""));
 }
+
+
+export function alertMessage(message, scroll = true, duration = 3000) {
+  const alert = document.createElement("div");
+  alert.classList.add("alert");
+  alert.innerHTML = `<p>${message}</p><span class="alert-close">×</span>`;
+  
+  const main = document.querySelector("main");
+  if (main) {
+    main.prepend(alert);
+  }
+  
+  if (scroll) {
+    window.scrollTo(0, 0);
+  }
+  
+  const closeBtn = alert.querySelector(".alert-close");
+  closeBtn.addEventListener("click", () => {
+    alert.remove();
+  });
+  
+  if (duration > 0) {
+    setTimeout(() => {
+      if (alert.parentElement) {
+        alert.remove();
+      }
+    }, duration);
+  }
+  
+  return alert;
+}
+
+export function removeAllAlerts() {
+  const alerts = document.querySelectorAll(".alert");
+  alerts.forEach((alert) => alert.remove());
+}
